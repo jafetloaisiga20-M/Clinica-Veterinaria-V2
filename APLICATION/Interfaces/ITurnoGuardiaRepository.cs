@@ -7,7 +7,7 @@ namespace APLICATION.Interfaces
 {
     public interface ITurnoGuardiaRepository
     {
-        Task<IEnumerable<Citas>> ListarTurnoAsync();
+        Task<IEnumerable<TurnoGuardia>> ListarTurnoAsync();
         Task NuevoTurno(TurnoGuardia oTurno);
         Task EditarTurno(TurnoGuardia oTurno);
         Task EliminarTurno(int id);

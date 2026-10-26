@@ -6,7 +6,11 @@ namespace APLICATION.DTOs
 {
     public class ExpedienteMedicoDTOs
     {
-       public int ID_EXPEDIENTE { get; set; }
+        /// <summary>
+        /// DTO (Data Transfer Object): Objeto plano utilizado para transferir datos entre la presentación (API/Frontend) y la aplicación. 
+        /// Sirve para estructurar la información exacta que requiere o envía el cliente, ocultando la estructura real de las entidades de base de datos.
+        /// </summary>
+        public int ID_EXPEDIENTE { get; set; }
        public int ID_PACIENTE { get; set; }
        public int ID_CITAS { get; set; }
        public string? MOTIVO_VISITA { get; set; }

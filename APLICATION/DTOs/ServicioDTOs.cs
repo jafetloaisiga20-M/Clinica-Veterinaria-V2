@@ -11,7 +11,7 @@ namespace APLICATION.DTOs
        public string?  CATEGORIA { get; set; }
        public string? DESCRIPCION_DE_SERVICIO { get; set; }
        public decimal PRECIO { get; set; }
-       public string? ESTADO { get; set; }
+       public string? ESTADO { get; set; } 
 
     }
 }
