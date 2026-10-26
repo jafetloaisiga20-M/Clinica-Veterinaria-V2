@@ -1,9 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using APLICATION.Interfaces;
+﻿using APLICATION.Interfaces;
 using DOMAIN.Entities;
 using INFRASTRUCTURE.DataBase;
+using Microsoft.Data.SqlClient;
+using System;
+using System.Collections.Generic;
+using System.Data;
+using System.Text;
 
 namespace INFRASTRUCTURE.Repository
 {
@@ -27,9 +29,21 @@ namespace INFRASTRUCTURE.Repository
             throw new NotImplementedException();
         }
 
-        public Task NuevoEnmiendaAsync(Enmienda oEnmienda)
+        public async Task NuevoEnmiendaAsync(Enmienda oEnmienda)
         {
-            throw new NotImplementedException();
+            using var con = _dBconnecttionFactory.CreateConnection();
+            await con.OpenAsync();
+
+            using (SqlCommand cmd = new SqlCommand("SP_NUEVA_ENMIENDA", con))
+            {
+                cmd.CommandType = CommandType.StoredProcedure;
+
+                cmd.Parameters.Add(new SqlParameter("@ID_EXPEDIENTE", oEnmienda.ID_EXPEDIENTE));
+                cmd.Parameters.Add(new SqlParameter("@ID_VETERINARIO", oEnmienda.ID_VETERINARIO));
+                cmd.Parameters.Add(new SqlParameter("@NOTA_ADICIONAL", oEnmienda.NOTA_ADICIONAL));
+
+                await cmd.ExecuteNonQueryAsync();
+            }
         }
 
         public Task EditarEnmiendaAsync(Enmienda oEnmienda)

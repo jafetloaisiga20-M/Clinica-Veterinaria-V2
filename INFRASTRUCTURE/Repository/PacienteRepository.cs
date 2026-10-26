@@ -1,9 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using APLICATION.Interfaces;
+﻿using APLICATION.Interfaces;
 using DOMAIN.Entities;
 using INFRASTRUCTURE.DataBase;
+using Microsoft.Data.SqlClient;
+using System;
+using System.Collections.Generic;
+using System.Data;
+using System.Text;
 
 namespace INFRASTRUCTURE.Repository
 {
@@ -23,20 +25,80 @@ namespace INFRASTRUCTURE.Repository
             _dBconnecttionFactory = bconnecttionFactory;
         }
 
-        public Task<IEnumerable<Paciente>> ListarPacienteAsync()
+        public async Task<IEnumerable<Paciente>> ListarPacienteAsync()
         {
-            throw new NotImplementedException();
+            var olist = new List<Paciente>();
+            using var con = _dBconnecttionFactory.CreateConnection();
+            await con.OpenAsync();
+
+            using (SqlCommand cmd = new SqlCommand("SP_LISTAR_PACIENTE", con))
+            {
+                cmd.CommandType = CommandType.StoredProcedure;
+                using (SqlDataReader dr = await cmd.ExecuteReaderAsync())
+                {
+                    while (await dr.ReadAsync())
+                    {
+                        olist.Add(new Paciente
+                        {
+                            ID_PACIENTE = Convert.ToInt32(dr["ID_PACIENTE"]),
+                            ID_CLIENTE = Convert.ToInt32(dr["ID_CLIENTE"]),
+                            NOMBRE = dr["NOMBRE"].ToString(),
+                            ESPECIE = dr["ESPECIE"].ToString(),
+                            RAZA = dr["RAZA"].ToString(),
+                            SEXO = dr["SEXO"].ToString(),
+                            FECHA_NACIMIENTO = Convert.ToDateTime(dr["ID_CLIENTE"]),
+                            PESO_ACTUAL = Convert.ToDecimal(dr["ID_CLIENTE"]),
+                            ESTADO = dr["ESTADO"].ToString()
+                        });
+                    }
+                }
+                return olist;
+            }
         }
 
-        public Task NuevoPaciente(Paciente oPaciente)
+        public async Task NuevoPaciente(Paciente oPaciente)
         {
-            throw new NotImplementedException();
+            using var con = _dBconnecttionFactory.CreateConnection();
+            await con.OpenAsync();
+
+            using (SqlCommand cmd = new SqlCommand("SP_NUEVO_PACIENTE", con))
+            {
+                cmd.CommandType = CommandType.StoredProcedure;
+
+                cmd.Parameters.Add(new SqlParameter("@ID_CLIENTE", oPaciente.ID_CLIENTE));
+                cmd.Parameters.Add(new SqlParameter("@NOMBRE", oPaciente.NOMBRE));
+                cmd.Parameters.Add(new SqlParameter("@ESPECIE", oPaciente.ESPECIE));
+                cmd.Parameters.Add(new SqlParameter("@RAZA", oPaciente.RAZA));
+                cmd.Parameters.Add(new SqlParameter("@SEXO", oPaciente.SEXO));
+                cmd.Parameters.Add(new SqlParameter("@FECHA_NACIMIENTO", oPaciente.FECHA_NACIMIENTO));
+                cmd.Parameters.Add(new SqlParameter("@PESO_ACTUAL", oPaciente.PESO_ACTUAL));
+
+                await cmd.ExecuteNonQueryAsync();
+            }
         }
 
 
-        public Task EditarPaciente(Paciente oPaciente)
+        public async Task EditarPaciente(Paciente oPaciente)
         {
-            throw new NotImplementedException();
+            using var con = _dBconnecttionFactory.CreateConnection();
+            await con.OpenAsync();
+
+            using (SqlCommand cmd = new SqlCommand("SP_EDITAR_PACIENTE", con))
+            {
+                cmd.CommandType = CommandType.StoredProcedure;
+
+                cmd.Parameters.Add(new SqlParameter("@ID", oPaciente.ID_PACIENTE));
+                cmd.Parameters.Add(new SqlParameter("@ID_CLIENTE", oPaciente.ID_CLIENTE));
+                cmd.Parameters.Add(new SqlParameter("@NOMBRE", oPaciente.NOMBRE));
+                cmd.Parameters.Add(new SqlParameter("@ESPECIE", oPaciente.ESPECIE));
+                cmd.Parameters.Add(new SqlParameter("@RAZA", oPaciente.RAZA));
+                cmd.Parameters.Add(new SqlParameter("@SEXO", oPaciente.SEXO));
+                cmd.Parameters.Add(new SqlParameter("@FECHA_NACIMIENTO", oPaciente.FECHA_NACIMIENTO));
+                cmd.Parameters.Add(new SqlParameter("@PESO_ACTUAL", oPaciente.PESO_ACTUAL));
+
+
+                await cmd.ExecuteNonQueryAsync();
+            }
         }
 
         public Task EliminarPaciente(int id)

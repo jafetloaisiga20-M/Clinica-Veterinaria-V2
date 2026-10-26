@@ -1,9 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using APLICATION.Interfaces;
+﻿using APLICATION.Interfaces;
 using DOMAIN.Entities;
 using INFRASTRUCTURE.DataBase;
+using Microsoft.Data.SqlClient;
+using System;
+using System.Collections.Generic;
+using System.Data;
+using System.Text;
 
 namespace INFRASTRUCTURE.Repository
 {
@@ -23,14 +25,56 @@ namespace INFRASTRUCTURE.Repository
         }
 
 
-        public Task<IEnumerable<ExpedienteMedico>> ListarExpedienteAsync()
+        public async Task<IEnumerable<ExpedienteMedico>> ListarExpedienteAsync()
         {
-            throw new NotImplementedException();
+            var olist = new List<ExpedienteMedico>();
+            using var con = _dBconnecttionFactory.CreateConnection();
+            await con.OpenAsync();
+
+            using (SqlCommand cmd = new SqlCommand("SP_LISTAR_EXPEDIENTE_MEDICO", con))
+            {
+                cmd.CommandType = CommandType.StoredProcedure;
+                using (SqlDataReader dr = await cmd.ExecuteReaderAsync())
+                {
+                    while (await dr.ReadAsync())
+                    {
+                        olist.Add(new ExpedienteMedico
+                        {
+                            ID_EXPEDIENTE = Convert.ToInt32(dr["ID_EXPEDIENTE"]),
+                            ID_PACIENTE = Convert.ToInt32(dr["ID_PACIENTE"]),
+                            ID_CITAS = Convert.ToInt32(dr["ID_CITAS"]),
+                            MOTIVO_VISITA = dr["MOTIVO_VISITA"].ToString(),
+                            SINTOMAS = dr["SINTOMAS"].ToString(),
+                            DIAGNOSTICO = dr["DIAGNOSTICO"].ToString(),
+                            TRATAMIENTOS = dr["TRATAMIENTOS"].ToString(),
+                            RECETA_MEDICA = dr["RECETA_MEDICA"].ToString(),
+                            FECHA_REGISTRO = Convert.ToDateTime(dr["FECHA_REGISTRO"]),
+                        });
+                    }
+                }
+                return olist;
+            }
         }
 
-        public Task NuevoExpediente(ExpedienteMedico oExpediente)
+        public async Task NuevoExpediente(ExpedienteMedico oExpediente)
         {
-            throw new NotImplementedException();
+            using var con = _dBconnecttionFactory.CreateConnection();
+            await con.OpenAsync();
+
+            using (SqlCommand cmd = new SqlCommand("SP_NUEVO_EXPEDIENTE", con))
+            {
+                cmd.CommandType = CommandType.StoredProcedure;
+
+                cmd.Parameters.Add(new SqlParameter("@ID_PACIENTE", oExpediente.ID_PACIENTE));
+                cmd.Parameters.Add(new SqlParameter("@ID_CITAS", oExpediente.ID_CITAS));
+                cmd.Parameters.Add(new SqlParameter("@MOTIVO_VISITA", oExpediente.MOTIVO_VISITA));
+                cmd.Parameters.Add(new SqlParameter("@SINTOMAS", oExpediente.SINTOMAS));
+                cmd.Parameters.Add(new SqlParameter("@DIAGNOSTICO", oExpediente.DIAGNOSTICO));
+                cmd.Parameters.Add(new SqlParameter("@TRATAMIENTOS", oExpediente.TRATAMIENTOS));
+                cmd.Parameters.Add(new SqlParameter("@RECETA_MEDICA", oExpediente.RECETA_MEDICA));
+
+                await cmd.ExecuteNonQueryAsync();
+            }
         }
 
         public Task EditarExpediente(ExpedienteMedico oExpediente)
