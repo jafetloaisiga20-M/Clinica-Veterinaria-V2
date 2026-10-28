@@ -5,6 +5,19 @@ using INFRASTRUCTURE.Repository;
 using Microsoft.Data.SqlClient;
 
 var builder = WebApplication.CreateBuilder(args);
+// 1. AGREGAR EL SERVICIO CORS (Va en la parte de arriba de tu archivo)
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("PermitirReact", builder =>
+    {
+        // Aquí pones la URL exacta donde corre tu React
+        builder.WithOrigins("http://localhost:5173")
+               .AllowAnyHeader()
+               .AllowAnyMethod();
+    });
+});
+
+builder.Services.AddControllers();
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
@@ -62,6 +75,8 @@ if (!app.Environment.IsDevelopment())
     app.UseExceptionHandler("/Home/Error");
 }
 app.UseRouting();
+// 2. ACTIVAR EL CORS
+app.UseCors("PermitirReact");
 
 app.UseAuthorization();
 
