@@ -1,4 +1,4 @@
-# Clinica Veterinaria V2
+﻿# Clinica Veterinaria V2
 
 Sistema de gestion para una clinica veterinaria. Backend en **ASP.NET Core
 (.NET 10)** con arquitectura por capas y frontend en **React + Vite**.
@@ -65,7 +65,7 @@ El APK ya compilado esta en `release\SaludAnimal.apk` y tambien en el
 Escritorio. Es una app Android que muestra la misma interfaz React y consume la
 misma API; no guarda una base de datos aparte.
 
-- Servidor inicial compilado: `http://192.168.80.119:5000/api`.
+- Servidor inicial compilado: `http://10.38.63.212:5000/api`.
 - Si la IP de la PC cambia, dentro de la app se abre el boton **Servidor** y se
   escribe la nueva direccion. No hace falta recompilar.
 - La API debe arrancar escuchando en toda la red, no solo en localhost:
@@ -99,3 +99,4 @@ problemas comunes:
 
 En desarrollo. La API expone endpoints REST bajo `/api/*` y el frontend consume
 `VITE_API_URL`. El health check `/health` valida tambien la conexion a la base.
+

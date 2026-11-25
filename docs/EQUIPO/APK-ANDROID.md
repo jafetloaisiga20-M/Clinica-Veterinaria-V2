@@ -1,4 +1,4 @@
-# APK Android - Salud Animal
+﻿# APK Android - Salud Animal
 
 Aplicacion Android para usar el sistema desde un telefono en la **misma red
 Wi-Fi** que la computadora donde corren la API y SQL Server.
@@ -33,15 +33,15 @@ Telefono Android
 | --- | --- |
 | APK en el Escritorio | `C:\Users\yeske\Desktop\SaludAnimal.apk` |
 | APK dentro del proyecto | `release\SaludAnimal.apk` |
-| Tamano | 5.735.793 bytes (aprox. 5,47 MB) |
-| SHA256 | `6E3D05431983C505731BCC15D6900E5D0F4F4361AA6F5837B86145C424AF80DE` |
+| Tamano | 5.830.383 bytes (aprox. 5,56 MB) |
+| SHA256 | `5F9D320B68DCF3148FBD58E6C959EF9A26B5D95A2436F3CE385C2D2BC82786A3` |
 | Paquete Android | `com.saludanimal.app` |
 | Version | 1.0 (versionCode 1) |
 | Android minimo | 7.0 (API 24) |
 | Android objetivo | API 36 |
-| Servidor inicial compilado | `http://192.168.80.119:5000/api` |
+| Servidor inicial compilado | `http://10.38.63.212:5000/api` |
 
-La IP `192.168.80.119` es la que tenia la PC de desarrollo al compilar. Si en
+La IP `10.38.63.212` es la que tenia la PC de desarrollo al compilar. Si en
 tu red cambia, no hace falta recompilar: se cambia desde el boton **Servidor**
 de la app (seccion 5).
 
@@ -119,13 +119,13 @@ Buscar la seccion de la conexion **Wi-Fi** y anotar la **Direccion IPv4**.
 Ejemplo de la maquina de desarrollo:
 
 ```text
-192.168.80.119
+10.38.63.212
 ```
 
 Con esa IP se forma la direccion de la API:
 
 ```text
-http://192.168.80.119:5000/api
+http://10.38.63.212:5000/api
 ```
 
 > En el telefono, `localhost` significa "el telefono mismo", no la PC. Por eso
@@ -172,7 +172,7 @@ que cree la regla. Sin ese paso, el telefono no podra entrar al puerto 5000.
 ### 3.5. Probar la API desde la PC
 
 ```powershell
-Invoke-RestMethod http://192.168.80.119:5000/health
+Invoke-RestMethod http://10.38.63.212:5000/health
 ```
 
 Debe responder algo parecido a:
@@ -223,7 +223,7 @@ modal **Servidor de la clinica**.
 1. En el campo **Direccion de la API** escribir:
 
    ```text
-   http://192.168.80.119:5000/api
+   http://10.38.63.212:5000/api
    ```
 
    Usar la IP real de la PC. Se puede escribir tambien sin `http://` y sin
@@ -298,7 +298,7 @@ Requisitos: Node 24, JDK 21 y Android SDK. En Windows:
 
 ```powershell
 Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
-.\scripts\build-apk.ps1 -ServerUrl "http://192.168.80.119:5000/api"
+.\scripts\build-apk.ps1 -ServerUrl "http://10.38.63.212:5000/api"
 ```
 
 El script:
@@ -316,10 +316,10 @@ Opciones utiles:
 
 ```powershell
 # Usar una salida distinta
-.\scripts\build-apk.ps1 -ServerUrl "http://192.168.80.119:5000/api" -OutputApk "C:\Temp\SaludAnimal.apk"
+.\scripts\build-apk.ps1 -ServerUrl "http://10.38.63.212:5000/api" -OutputApk "C:\Temp\SaludAnimal.apk"
 
 # Reutilizar node_modules sin ejecutar npm ci
-.\scripts\build-apk.ps1 -ServerUrl "http://192.168.80.119:5000/api" -SkipInstall
+.\scripts\build-apk.ps1 -ServerUrl "http://10.38.63.212:5000/api" -SkipInstall
 ```
 
 ### 7.2. Forma manual
@@ -330,7 +330,7 @@ cd Frontend
 $env:JAVA_HOME = "C:\ruta\al\jdk-21"
 $env:ANDROID_HOME = "C:\ruta\al\Android\sdk"
 $env:ANDROID_SDK_ROOT = $env:ANDROID_HOME
-$env:VITE_API_URL = "http://192.168.80.119:5000/api"
+$env:VITE_API_URL = "http://10.38.63.212:5000/api"
 
 npm ci
 npm run build
@@ -409,7 +409,7 @@ curl.exe -i -X OPTIONS `
   -H "Origin: http://localhost" `
   -H "Access-Control-Request-Method: GET" `
   -H "Access-Control-Request-Headers: authorization,content-type" `
-  http://192.168.80.119:5000/api/Cliente
+  http://10.38.63.212:5000/api/Cliente
 ```
 
 Debe devolver `204` y `Access-Control-Allow-Origin: http://localhost`.
@@ -472,7 +472,7 @@ Checklist de seguridad antes de una entrega real:
   - `android:usesCleartextTraffic="true"`
   - `minSdkVersion 24`, `targetSdkVersion 36`
 - Assets web dentro del APK verificados: incluyen el selector de servidor y la
-  IP inicial `192.168.80.119`.
+  IP inicial `10.38.63.212`.
 - API real probada en la PC:
   - `/health` responde `200` con `database: ok`.
   - CORS preflight para `Origin: http://localhost` responde `204` y permite
@@ -491,3 +491,4 @@ Checklist de seguridad antes de una entrega real:
 - [Infraestructura y despliegue](../INFRAESTRUCTURA.md)
 - [README del proyecto](../../README.md)
 - [Frontend / Android](../../Frontend/README.md)
+

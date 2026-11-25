@@ -1,4 +1,4 @@
-# Frontend - Clinica Veterinaria
+﻿# Frontend - Clinica Veterinaria
 
 React + Vite. Consume la API ASP.NET Core.
 
@@ -38,7 +38,7 @@ pero dentro de la app se puede cambiar con el boton **Servidor** (se guarda en
 Compilacion manual desde esta carpeta:
 
 ```powershell
-$env:VITE_API_URL = "http://192.168.80.119:5000/api"
+$env:VITE_API_URL = "http://10.38.63.212:5000/api"
 npm ci
 npm run build:android
 npm run apk:debug
@@ -54,7 +54,7 @@ Desde la raiz del repositorio tambien esta el script completo, que copia el APK
 al Escritorio:
 
 ```powershell
-.\scripts\build-apk.ps1 -ServerUrl "http://192.168.80.119:5000/api"
+.\scripts\build-apk.ps1 -ServerUrl "http://10.38.63.212:5000/api"
 ```
 
 Las imagenes fuente del icono y splash estan en `assets/` y se pueden regenerar
@@ -80,3 +80,4 @@ El repositorio incluye `netlify.toml` en la raiz. Solo hay que:
 2. Definir la variable `VITE_API_URL` con la URL publica de la API
    (ejemplo: `https://tu-api.azurewebsites.net/api`).
 3. Confirmar que esa URL este en `Cors__AllowedOrigins` de la API.
+

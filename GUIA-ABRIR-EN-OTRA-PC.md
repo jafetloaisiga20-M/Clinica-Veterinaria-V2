@@ -1,4 +1,4 @@
-# Guia para abrir el proyecto en otra PC
+﻿# Guia para abrir el proyecto en otra PC
 
 Esta guia deja el sistema completo funcionando en una computadora nueva con
 **SQL Server local**, **API .NET** y **frontend React**.
@@ -444,7 +444,7 @@ Pasos:
 Si la IP de la PC cambia, no hace falta recompilar: abrir **Servidor**, escribir
 la nueva direccion, probar y guardar.
 
-El APK compilado apunta inicialmente a `http://192.168.80.119:5000/api`.
+El APK compilado apunta inicialmente a `http://10.38.63.212:5000/api`.
 
 Firewall (PowerShell como administrador):
 
@@ -494,3 +494,4 @@ Guia completa (compilar, cambiar IP y problemas comunes):
 - [ ] `smoke-test.ps1` termina en `Todo responde correctamente.`
 - [ ] APK instalado en el telefono y con la IP correcta
 - [ ] Un cliente/cita creado desde el telefono aparece en SQL Server
+

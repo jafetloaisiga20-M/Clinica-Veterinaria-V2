@@ -3,7 +3,7 @@
 #   .\scripts\build-apk.ps1 -ServerUrl "http://192.168.1.50:5000/api"
 # Requiere Node 24, JDK 21 y Android SDK (platforms;android-36 + build-tools;36.0.0).
 param(
-  [string]$ServerUrl = "http://192.168.1.50:5000/api",
+  [string]$ServerUrl = "http://10.38.63.212:5000/api",
   [string]$OutputApk = "",
   [string]$JavaHome = $env:JAVA_HOME,
   [string]$AndroidSdk = $env:ANDROID_HOME,
