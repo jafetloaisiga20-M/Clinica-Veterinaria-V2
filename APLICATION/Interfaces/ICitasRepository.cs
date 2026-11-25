@@ -8,7 +8,8 @@ namespace APLICATION.Interfaces
     public interface ICitasRepository
     {
         Task<IEnumerable<Citas>> ListarCitasAsync();
-        Task NuevaCita(Citas oCitas);
+        Task<bool> ExisteChoqueHorarioAsync(int idVeterinario, DateTime fechaHora);
+        Task<int> NuevaCita(Citas oCitas);
         Task EditarCitas(Citas oCitas);
         Task EliminarCitas(int id);
 

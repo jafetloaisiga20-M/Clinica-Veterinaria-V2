@@ -1,0 +1,74 @@
+name: Backup base de datos
+
+# Respaldo diario automatico (BACPAC) como artefacto de GitHub.
+# Requisitos:
+#   1. Secret   DB_CONNECTION_STRING  -> cadena de conexion de la base en la nube
+#   2. Variable DB_BACKUP_ENABLED     -> "true" para activar el cron
+#   3. La base debe aceptar conexiones desde GitHub Actions
+#      (Azure SQL: Firewall -> "Allow Azure services and resources to access this server")
+#
+# El artefacto queda disponible 90 dias en la pestana Actions del repositorio.
+
+on:
+  schedule:
+    # 07:00 UTC = 01:00 en Nicaragua (UTC-6)
+    - cron: "0 7 * * *"
+  workflow_dispatch:
+
+concurrency:
+  group: backup-db
+  cancel-in-progress: false
+
+jobs:
+  backup:
+    name: Exportar BACPAC
+    if: ${{ github.event_name == 'workflow_dispatch' || vars.DB_BACKUP_ENABLED == 'true' }}
+    runs-on: windows-latest
+    steps:
+      - name: Descargar codigo
+        uses: actions/checkout@v4
+
+      - name: Instalar .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "10.0.x"
+
+      - name: Instalar SqlPackage
+        run: dotnet tool install --global microsoft.sqlpackage
+
+      - name: Exportar respaldo
+        shell: pwsh
+        env:
+          DB_CONNECTION_STRING: ${{ secrets.DB_CONNECTION_STRING }}
+        run: |
+          if ([string]::IsNullOrWhiteSpace($env:DB_CONNECTION_STRING)) {
+            throw "Falta el secret DB_CONNECTION_STRING."
+          }
+
+          $timestamp = Get-Date -Format "yyyyMMdd-HHmmss"
+          $file = "backup-$timestamp.bacpac"
+          $sqlPackage = Join-Path $env:USERPROFILE ".dotnet\tools\sqlpackage.exe"
+
+          & $sqlPackage /Action:Export `
+            "/SourceConnectionString:$env:DB_CONNECTION_STRING" `
+            "/TargetFile:$file" `
+            "/OverwriteFiles:True"
+
+          if ($LASTEXITCODE -ne 0 -or -not (Test-Path $file)) {
+            throw "El respaldo fallo con codigo $LASTEXITCODE."
+          }
+
+          $hash = (Get-FileHash -Algorithm SHA256 -Path $file).Hash
+          "$hash  $file" | Set-Content -Encoding ASCII "$file.sha256"
+
+          $sizeMb = [math]::Round((Get-Item $file).Length / 1MB, 2)
+          Write-Host "Respaldo generado: $file ($sizeMb MB)"
+
+      - name: Publicar artefacto
+        uses: actions/upload-artifact@v4
+        with:
+          name: db-backup-${{ github.run_number }}
+          path: |
+            *.bacpac
+            *.bacpac.sha256
+          retention-days: 90

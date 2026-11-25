@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
+using System.Linq;
+using System.Threading.Tasks;
 using APLICATION.DTOs;
 using APLICATION.Interfaces;
 using DOMAIN.Entities;
@@ -9,44 +10,36 @@ namespace APLICATION.Servicios
 {
     public class EnmiendaMedicaServices
     {
-        /// <summary>
-        /// Servicios (Casos de Uso): Orquestan la lógica de la aplicación. 
-        /// Se encargan de inyectar las interfaces de los repositorios, ejecutar reglas de validación, procesar la información y mapear las Entidades del Dominio hacia los DTOs que se devolverán al controlador.
-        /// </summary>
+        private readonly IEnmiendaRepository _repo;
 
-        private readonly IEnmiendaRepository _repository;
-
-        public EnmiendaMedicaServices(IEnmiendaRepository repository)
+        public EnmiendaMedicaServices(IEnmiendaRepository repo)
         {
-            _repository = repository;
+            _repo = repo;
         }
 
-        //Listar ---------------------------------------------------------------------
-        public async Task<IEnumerable<EnmiendaDTOs>> ListarEnmienda()
+        public async Task<IEnumerable<EnmiendaDTOs>> Listar()
         {
-            var lista = await _repository.ListarEnmiendaAsync();
-            return lista.Select(p => new EnmiendaDTOs
+            var lista = await _repo.ListarEnmiendaAsync();
+            return lista.Select(e => new EnmiendaDTOs
             {
-               ID_ENMIENDA = p.ID_ENMIENDA,
-               ID_EXPEDIENTE = p.ID_EXPEDIENTE,
-               ID_VETERINARIO = p.ID_VETERINARIO,
-               NOTA_ADICIONAL = p.NOTA_ADICIONAL,
-               FECHA_ENMIENDA = p.FECHA_ENMIENDA
+                ID_ENMIENDA = e.ID_ENMIENDA,
+                ID_EXPEDIENTE = e.ID_EXPEDIENTE,
+                ID_VETERINARIO = e.ID_VETERINARIO,
+                NOTA_ADICIONAL = e.NOTA_ADICIONAL,
+                FECHA_ENMIENDA = e.FECHA_ENMIENDA
             });
         }
 
-        //insertar ---------------------------------------------------------------------
-        public async Task NuevaEnmienda(EnmiendaDTOs EnmiendaM)
+        public async Task Nueva(EnmiendaDTOs dto)
         {
-            var oEnmienda = new Enmienda
+            var ent = new Enmienda
             {
-                ID_EXPEDIENTE = EnmiendaM.ID_EXPEDIENTE,
-                ID_VETERINARIO = EnmiendaM.ID_VETERINARIO,
-                NOTA_ADICIONAL = EnmiendaM.NOTA_ADICIONAL                
+                ID_EXPEDIENTE = dto.ID_EXPEDIENTE,
+                ID_VETERINARIO = dto.ID_VETERINARIO,
+                NOTA_ADICIONAL = dto.NOTA_ADICIONAL,
+                FECHA_ENMIENDA = DateTime.UtcNow
             };
-            await _repository.NuevoEnmiendaAsync(oEnmienda);
+            await _repo.NuevoEnmiendaAsync(ent);
         }
-
-       
     }
 }

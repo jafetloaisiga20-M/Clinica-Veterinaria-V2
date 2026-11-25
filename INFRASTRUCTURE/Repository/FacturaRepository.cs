@@ -40,17 +40,17 @@ namespace INFRASTRUCTURE.Repository
                     {
                         olist.Add(new Factura
                         {
-                            ID_FACTURA = Convert.ToInt32(dr["ID_CLIENTE"]),
-                            ID_CITA = Convert.ToInt32(dr["ID_CLIENTE"]),
+                            ID_FACTURA = Convert.ToInt32(dr["ID_FACTURA"]),
+                            ID_CITA = Convert.ToInt32(dr["ID_CITA"]),
                             ID_CLIENTE = Convert.ToInt32(dr["ID_CLIENTE"]),
-                            NUMERO_FACTURA = dr["WHATSAPP"].ToString(),
-                            TICKET_IMPRESO = Convert.ToBoolean(dr["ID_CLIENTE"]),
-                            FECHA_EMISION = Convert.ToDateTime(dr["ID_CLIENTE"]),
-                            SUBTOTAL = Convert.ToDecimal(dr["ID_CLIENTE"]),
-                            IMPUESTOS = Convert.ToDecimal(dr["ID_CLIENTE"]),
-                            TOTAL_PAGAR = Convert.ToDecimal(dr["ID_CLIENTE"]),
-                            METODO_PAGO = dr["ESTADO"].ToString(),
-                            ESTADO_FACTURA = dr["ESTADO"].ToString()
+                            NUMERO_FACTURA = dr["NUMERO_FACTURA"].ToString(),
+                            TICKET_IMPRESO = Convert.ToBoolean(dr["TICKET_IMPRESO"]),
+                            FECHA_EMISION = Convert.ToDateTime(dr["FECHA_EMISION"]),
+                            SUBTOTAL = Convert.ToDecimal(dr["SUBTOTAL"]),
+                            IMPUESTOS = Convert.ToDecimal(dr["IMPUESTOS"]),
+                            TOTAL_PAGAR = Convert.ToDecimal(dr["TOTAL_PAGAR"]),
+                            METODO_PAGO = dr["METODO_PAGO"].ToString(),
+                            ESTADO_FACTURA = dr["ESTADO_FACTURA"].ToString()
 
                         });
                     }

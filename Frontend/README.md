@@ -1,16 +1,82 @@
-# React + Vite
+# Frontend - Clinica Veterinaria
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+React + Vite. Consume la API ASP.NET Core.
 
-Currently, two official plugins are available:
+## Desarrollo
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+```powershell
+copy .env.example .env
+npm install
+npm run dev
+```
 
-## React Compiler
+Abre http://localhost:5173.
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+La URL de la API se configura en `.env`:
 
-## Expanding the Oxlint configuration
+```
+VITE_API_URL=http://localhost:5000/api
+```
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and Oxlint's TypeScript related rules in your project.
+No hardcodear IPs ni puertos en `App.jsx`; usar siempre `import.meta.env`.
+
+## Compilar
+
+```powershell
+npm run build
+```
+
+Genera `dist/`, que es lo que se publica.
+
+## APK Android
+
+La app Android esta hecha con **Capacitor**: el APK abre el mismo build de React
+en un WebView y consume la API. La URL de la API se compila como valor inicial,
+pero dentro de la app se puede cambiar con el boton **Servidor** (se guarda en
+`localStorage`).
+
+Compilacion manual desde esta carpeta:
+
+```powershell
+$env:VITE_API_URL = "http://192.168.80.119:5000/api"
+npm ci
+npm run build:android
+npm run apk:debug
+```
+
+El APK queda en:
+
+```text
+android\app\build\outputs\apk\debug\app-debug.apk
+```
+
+Desde la raiz del repositorio tambien esta el script completo, que copia el APK
+al Escritorio:
+
+```powershell
+.\scripts\build-apk.ps1 -ServerUrl "http://192.168.80.119:5000/api"
+```
+
+Las imagenes fuente del icono y splash estan en `assets/` y se pueden regenerar
+con `..\scripts\make-android-assets.ps1` y `npm run assets:android`.
+
+Guia completa (firewall, instalar en el telefono, problemas):
+[../docs/EQUIPO/APK-ANDROID.md](../docs/EQUIPO/APK-ANDROID.md).
+
+## Docker
+
+```powershell
+docker build -t clinica-frontend .
+```
+
+El contenedor usa nginx y redirige `/api/*` al servicio `api` (definido en
+`docker-compose.yml`).
+
+## Despliegue en Netlify
+
+El repositorio incluye `netlify.toml` en la raiz. Solo hay que:
+
+1. Importar el repositorio en Netlify.
+2. Definir la variable `VITE_API_URL` con la URL publica de la API
+   (ejemplo: `https://tu-api.azurewebsites.net/api`).
+3. Confirmar que esa URL este en `Cors__AllowedOrigins` de la API.

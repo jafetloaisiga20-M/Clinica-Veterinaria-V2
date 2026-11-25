@@ -1,0 +1,64 @@
+name: Deploy API (Azure App Service)
+
+# Se ejecuta manualmente para no romper nada hasta que Yeskel configure Azure.
+# Secrets requeridos:
+#   AZURE_WEBAPP_NAME              nombre del App Service
+#   AZURE_WEBAPP_PUBLISH_PROFILE   contenido del publish profile descargado de Azure
+# Variable opcional:
+#   API_HEALTH_URL                 https://tu-app.azurewebsites.net/health
+on:
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-api
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    name: Publicar en Azure
+    runs-on: ubuntu-latest
+    steps:
+      - name: Descargar codigo
+        uses: actions/checkout@v4
+
+      - name: Instalar .NET 10
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "10.0.x"
+
+      - name: Verificar configuracion
+        shell: bash
+        run: |
+          if [ -z "${{ secrets.AZURE_WEBAPP_NAME }}" ]; then
+            echo "::error::Falta el secret AZURE_WEBAPP_NAME"
+            exit 1
+          fi
+          if [ -z "${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}" ]; then
+            echo "::error::Falta el secret AZURE_WEBAPP_PUBLISH_PROFILE"
+            exit 1
+          fi
+
+      - name: Compilar y publicar
+        run: dotnet publish "PRESENTATION/PRESENTATION.csproj" -c Release -o ./publish
+
+      - name: Desplegar
+        uses: azure/webapps-deploy@v3
+        with:
+          app-name: ${{ secrets.AZURE_WEBAPP_NAME }}
+          publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
+          package: ./publish
+
+      - name: Health check
+        if: ${{ vars.API_HEALTH_URL != '' }}
+        shell: bash
+        run: |
+          for i in {1..12}; do
+            if curl -fsS "${{ vars.API_HEALTH_URL }}"; then
+              echo "API saludable"
+              exit 0
+            fi
+            echo "Esperando a que la API responda ($i/12)..."
+            sleep 10
+          done
+          echo "::error::La API no respondio al health check"
+          exit 1

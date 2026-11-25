@@ -38,8 +38,14 @@ namespace APLICATION.Servicios
         }
 
         //insertar ---------------------------------------------------------------------
-        public async Task Nuevacita(CitasDTOs Cit)
+        public async Task<int> Nuevacita(CitasDTOs Cit)
         {
+            if (await _repository.ExisteChoqueHorarioAsync(Cit.ID_VETERINARIO, Cit.FECHA_HORA))
+            {
+                throw new InvalidOperationException(
+                    "El veterinario ya tiene una cita en ese horario (margen de 30 minutos).");
+            }
+
             var oCitas = new Citas
             {
                 ID_PACIENTE = Cit.ID_PACIENTE,
@@ -49,7 +55,7 @@ namespace APLICATION.Servicios
                 ORIGEN_CONTACTO = Cit.ORIGEN_CONTACTO,
                 ESTADO_CITA = Cit.ESTADO_CITA
             };
-            await _repository.NuevaCita(oCitas);
+            return await _repository.NuevaCita(oCitas);
         }
 
         //Editar ---------------------------------------------------------------------

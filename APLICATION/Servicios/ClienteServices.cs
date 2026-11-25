@@ -37,7 +37,7 @@ namespace APLICATION.Servicios
         }
 
         //Nuevo------------------------------------------------------
-        public async Task NuevoCliente(ClienteDTOs Clien)
+        public async Task<int> NuevoCliente(ClienteDTOs Clien)
         {
             var oCliente = new Cliente
             {
@@ -48,7 +48,7 @@ namespace APLICATION.Servicios
                 DIRECCION = Clien.DIRECCION,
                 ESTADO = Clien.ESTADO
             };
-            await _repository.NuevoClienteAsync(oCliente);
+            return await _repository.NuevoClienteAsync(oCliente);
         }
         //editar
         public async Task EditarCliente(ClienteDTOs Clien)

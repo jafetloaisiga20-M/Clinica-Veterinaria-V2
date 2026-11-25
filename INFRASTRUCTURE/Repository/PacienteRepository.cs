@@ -46,8 +46,8 @@ namespace INFRASTRUCTURE.Repository
                             ESPECIE = dr["ESPECIE"].ToString(),
                             RAZA = dr["RAZA"].ToString(),
                             SEXO = dr["SEXO"].ToString(),
-                            FECHA_NACIMIENTO = Convert.ToDateTime(dr["ID_CLIENTE"]),
-                            PESO_ACTUAL = Convert.ToDecimal(dr["ID_CLIENTE"]),
+                            FECHA_NACIMIENTO = Convert.ToDateTime(dr["FECHA_NACIMIENTO"]),
+                            PESO_ACTUAL = Convert.ToDecimal(dr["PESO_ACTUAL"]),
                             ESTADO = dr["ESTADO"].ToString()
                         });
                     }
@@ -56,7 +56,7 @@ namespace INFRASTRUCTURE.Repository
             }
         }
 
-        public async Task NuevoPaciente(Paciente oPaciente)
+        public async Task<int> NuevoPaciente(Paciente oPaciente)
         {
             using var con = _dBconnecttionFactory.CreateConnection();
             await con.OpenAsync();
@@ -73,7 +73,8 @@ namespace INFRASTRUCTURE.Repository
                 cmd.Parameters.Add(new SqlParameter("@FECHA_NACIMIENTO", oPaciente.FECHA_NACIMIENTO));
                 cmd.Parameters.Add(new SqlParameter("@PESO_ACTUAL", oPaciente.PESO_ACTUAL));
 
-                await cmd.ExecuteNonQueryAsync();
+                var result = await cmd.ExecuteScalarAsync();
+                return result == null || result == DBNull.Value ? 0 : Convert.ToInt32(result);
             }
         }
 

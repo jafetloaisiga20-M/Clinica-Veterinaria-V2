@@ -42,10 +42,10 @@ namespace INFRASTRUCTURE.Repository
                             ID_CITAS = Convert.ToInt32(dr["ID_CITAS"]),
                             ID_PACIENTE = Convert.ToInt32(dr["ID_PACIENTE"]),
                             ID_SUCURSAL = Convert.ToInt32(dr["ID_SUCURSAL"]),
-                            ID_VETERINARIO = Convert.ToInt32(dr["ID_VETERIANRIO"]),
+                            ID_VETERINARIO = Convert.ToInt32(dr["ID_VETERINARIO"]),
                             FECHA_HORA = Convert.ToDateTime(dr["FECHA_HORA"]),
                             ORIGEN_CONTACTO = dr["ORIGEN_CONTACTO"].ToString(),
-                            ESTADO_CITA = dr["ESTADP_CITA"].ToString()
+                            ESTADO_CITA = dr["ESTADO_CITA"].ToString()
                         });
                     }
                 }
@@ -54,7 +54,22 @@ namespace INFRASTRUCTURE.Repository
             
         }
 
-        public async Task NuevaCita(Citas oCitas)
+        public async Task<bool> ExisteChoqueHorarioAsync(int idVeterinario, DateTime fechaHora)
+        {
+            using var con = _dBconnecttionFactory.CreateConnection();
+            await con.OpenAsync();
+            using (SqlCommand cmd = new SqlCommand(
+                "SELECT COUNT(*) FROM dbo.CITA WHERE ID_VETERINARIO = @ID_VETERINARIO " +
+                "AND FECHA_HORA BETWEEN DATEADD(MINUTE, -30, @FECHA_HORA) AND DATEADD(MINUTE, 30, @FECHA_HORA)", con))
+            {
+                cmd.Parameters.Add(new SqlParameter("@ID_VETERINARIO", idVeterinario));
+                cmd.Parameters.Add(new SqlParameter("@FECHA_HORA", fechaHora));
+                var result = await cmd.ExecuteScalarAsync();
+                return Convert.ToInt32(result) > 0;
+            }
+        }
+
+        public async Task<int> NuevaCita(Citas oCitas)
         {
             using var con = _dBconnecttionFactory.CreateConnection();
             await con.OpenAsync();
@@ -69,7 +84,8 @@ namespace INFRASTRUCTURE.Repository
                     cmd.Parameters.Add(new SqlParameter("@FECHA_HORA", oCitas.FECHA_HORA));
                     cmd.Parameters.Add(new SqlParameter("@ORIGEN_CONTACTO", oCitas.ORIGEN_CONTACTO));
 
-                    await cmd.ExecuteNonQueryAsync();
+                    var result = await cmd.ExecuteScalarAsync();
+                    return result == null || result == DBNull.Value ? 0 : Convert.ToInt32(result);
                 }
         }
         public  async Task EditarCitas(Citas oCitas)
@@ -82,11 +98,11 @@ namespace INFRASTRUCTURE.Repository
                 cmd.CommandType = CommandType.StoredProcedure;
 
                 cmd.Parameters.Add(new SqlParameter("@ID", oCitas.ID_CITAS));
-                cmd.Parameters.Add(new SqlParameter("@ID_PACIENTE", oCitas.ID_CITAS));
-                cmd.Parameters.Add(new SqlParameter("@ID_SUCURSAL", oCitas.ID_CITAS));
-                cmd.Parameters.Add(new SqlParameter("@ID_VETERIANRIO", oCitas.ID_CITAS));
-                cmd.Parameters.Add(new SqlParameter("@FECHA_HORA", oCitas.ID_CITAS));
-                cmd.Parameters.Add(new SqlParameter("@ORIGEN_CONTACTO", oCitas.ID_CITAS));
+                cmd.Parameters.Add(new SqlParameter("@ID_PACIENTE", oCitas.ID_PACIENTE));
+                cmd.Parameters.Add(new SqlParameter("@ID_SUCURSAL", oCitas.ID_SUCURSAL));
+                cmd.Parameters.Add(new SqlParameter("@ID_VETERINARIO", oCitas.ID_VETERINARIO));
+                cmd.Parameters.Add(new SqlParameter("@FECHA_HORA", oCitas.FECHA_HORA));
+                cmd.Parameters.Add(new SqlParameter("@ORIGEN_CONTACTO", oCitas.ORIGEN_CONTACTO));
 
                 await cmd.ExecuteNonQueryAsync();
             }

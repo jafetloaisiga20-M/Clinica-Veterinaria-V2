@@ -361,3 +361,31 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+
+# ============================================================
+# Clinica Veterinaria: variables de entorno y respaldos
+# ============================================================
+.env
+.env.local
+!.env.example
+backups/
+*.bacpac
+*.bak
+*.sha256
+Frontend/.env
+Frontend/.env.local
+
+# ============================================================
+# Android / APK
+# ============================================================
+Frontend/android/local.properties
+Frontend/android/.gradle/
+Frontend/android/app/build/
+Frontend/android/build/
+Frontend/android/app/src/main/assets/public/
+Frontend/android/app/src/main/assets/capacitor.config.json
+Frontend/android/capacitor-cordova-android-plugins/
+*.apk
+*.aab
+*.jks
+*.keystore

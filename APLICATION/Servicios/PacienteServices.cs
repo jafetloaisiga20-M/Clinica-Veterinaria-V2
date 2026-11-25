@@ -42,7 +42,7 @@ namespace APLICATION.Servicios
         }
 
         //insertar ---------------------------------------------------------------------
-        public async Task NuevoPaciente(PacienteDTOs Pac)
+        public async Task<int> NuevoPaciente(PacienteDTOs Pac)
         {
             var oPaciente = new Paciente
             {
@@ -55,7 +55,7 @@ namespace APLICATION.Servicios
                 PESO_ACTUAL = Pac.PESO_ACTUAL,
                 ESTADO = Pac.ESTADO
             };
-            await _repository.NuevoPaciente(oPaciente);
+            return await _repository.NuevoPaciente(oPaciente);
         }
 
         //Editar ---------------------------------------------------------------------

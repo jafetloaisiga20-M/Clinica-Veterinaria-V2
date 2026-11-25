@@ -1,0 +1,74 @@
+name: CI
+
+on:
+  push:
+    branches: [master, main]
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  backend:
+    name: Backend (.NET 10)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Descargar codigo
+        uses: actions/checkout@v4
+
+      - name: Instalar .NET 10
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "10.0.x"
+
+      - name: Restaurar paquetes
+        run: dotnet restore "PRESENTATION/PRESENTATION.csproj"
+
+      - name: Compilar
+        run: dotnet build "PRESENTATION/PRESENTATION.csproj" -c Release --no-restore
+
+      # Cuando el equipo agregue pruebas unitarias, descomentar:
+      # - name: Ejecutar pruebas
+      #   run: dotnet test -c Release --no-build
+
+  frontend:
+    name: Frontend (React + Vite)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: Frontend
+    steps:
+      - name: Descargar codigo
+        uses: actions/checkout@v4
+
+      - name: Instalar Node 24
+        uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+          cache: npm
+          cache-dependency-path: Frontend/package-lock.json
+
+      - name: Instalar dependencias
+        run: npm ci
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Compilar
+        run: npm run build
+
+  docker:
+    name: Docker (API)
+    runs-on: ubuntu-latest
+    needs: backend
+    steps:
+      - name: Descargar codigo
+        uses: actions/checkout@v4
+
+      - name: Construir imagen de la API
+        run: docker build -t clinica-veterinaria-api:ci .
+
+      - name: Construir imagen del frontend
+        run: docker build -t clinica-veterinaria-frontend:ci ./Frontend

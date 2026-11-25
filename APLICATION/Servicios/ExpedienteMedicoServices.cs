@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
+using System.Linq;
+using System.Threading.Tasks;
 using APLICATION.DTOs;
 using APLICATION.Interfaces;
 using DOMAIN.Entities;
@@ -9,78 +10,44 @@ namespace APLICATION.Servicios
 {
     public class ExpedienteMedicoServices
     {
+        private readonly IExpedienteMedicoRepository _repo;
 
-        /// <summary>
-        /// Servicios (Casos de Uso): Orquestan la lógica de la aplicación. 
-        /// Se encargan de inyectar las interfaces de los repositorios, ejecutar reglas de validación, procesar la información y mapear las Entidades del Dominio hacia los DTOs que se devolverán al controlador.
-        /// </summary>
-
-
-        private readonly IExpedienteMedicoRepository _repository;
-
-        public ExpedienteMedicoServices(IExpedienteMedicoRepository repository)
+        public ExpedienteMedicoServices(IExpedienteMedicoRepository repo)
         {
-            _repository = repository;
+            _repo = repo;
         }
 
-        //Listar ---------------------------------------------------------------------
-        public async Task<IEnumerable<ExpedienteMedicoDTOs>> ListarExpedienteMEdico()
+        public async Task<IEnumerable<ExpedienteMedicoDTOs>> Listar()
         {
-            var lista = await _repository.ListarExpedienteAsync();
-            return lista.Select(p => new ExpedienteMedicoDTOs
+            var lista = await _repo.ListarExpedienteAsync();
+            return lista.Select(e => new ExpedienteMedicoDTOs
             {
-                ID_EXPEDIENTE = p.ID_EXPEDIENTE,
-                ID_CITAS = p.ID_CITAS,
-                ID_PACIENTE = p.ID_PACIENTE,
-                MOTIVO_VISITA = p.MOTIVO_VISITA,
-                SINTOMAS= p.SINTOMAS,
-                DIAGNOSTICO = p.DIAGNOSTICO,
-                TRATAMIENTOS = p.TRATAMIENTOS,
-                RECETA_MEDICA = p.RECETA_MEDICA,
-                FECHA_REGISTRO = p.FECHA_REGISTRO,
-              
+                ID_EXPEDIENTE = e.ID_EXPEDIENTE,
+                ID_PACIENTE = e.ID_PACIENTE,
+                ID_CITAS = e.ID_CITAS,
+                MOTIVO_VISITA = e.MOTIVO_VISITA,
+                SINTOMAS = e.SINTOMAS,
+                DIAGNOSTICO = e.DIAGNOSTICO,
+                TRATAMIENTOS = e.TRATAMIENTOS,
+                RECETA_MEDICA = e.RECETA_MEDICA,
+                FECHA_REGISTRO = e.FECHA_REGISTRO
             });
         }
 
-        //insertar ---------------------------------------------------------------------
-        public async Task NuevoExpediente(ExpedienteMedicoDTOs ExM)
+        public async Task Nuevo(ExpedienteMedicoDTOs dto)
         {
-            var oExpediente = new ExpedienteMedico
+            var ent = new ExpedienteMedico
             {
-                ID_CITAS = ExM.ID_CITAS,
-                ID_PACIENTE = ExM.ID_PACIENTE,
-                MOTIVO_VISITA = ExM.MOTIVO_VISITA,
-                SINTOMAS = ExM.SINTOMAS,
-                DIAGNOSTICO = ExM.DIAGNOSTICO,
-                TRATAMIENTOS = ExM.TRATAMIENTOS,
-                RECETA_MEDICA = ExM.RECETA_MEDICA,
-                FECHA_REGISTRO = ExM.FECHA_REGISTRO,
+                ID_PACIENTE = dto.ID_PACIENTE,
+                ID_CITAS = dto.ID_CITAS,
+                MOTIVO_VISITA = dto.MOTIVO_VISITA,
+                SINTOMAS = dto.SINTOMAS,
+                DIAGNOSTICO = dto.DIAGNOSTICO,
+                TRATAMIENTOS = dto.TRATAMIENTOS,
+                RECETA_MEDICA = dto.RECETA_MEDICA,
+                FECHA_REGISTRO = DateTime.UtcNow
             };
-            await _repository.NuevoExpediente(oExpediente);
-        }
-
-        //Editar ---------------------------------------------------------------------
-        public async Task EditarExpediente(ExpedienteMedicoDTOs ExM)
-        {
-            var oExpediente = new ExpedienteMedico
-            {
-                ID_EXPEDIENTE = ExM.ID_EXPEDIENTE,
-                ID_CITAS = ExM.ID_CITAS,
-                ID_PACIENTE = ExM.ID_PACIENTE,
-                MOTIVO_VISITA = ExM.MOTIVO_VISITA,
-                SINTOMAS = ExM.SINTOMAS,
-                DIAGNOSTICO = ExM.DIAGNOSTICO,
-                TRATAMIENTOS = ExM.TRATAMIENTOS,
-                RECETA_MEDICA = ExM.RECETA_MEDICA,
-                FECHA_REGISTRO = ExM.FECHA_REGISTRO,
-            };
-            await _repository.EditarExpediente(oExpediente);
-        }
-
-        //Eliminar ---------------------------------------------------------------------
-        public async Task EliminarExpediente(int id)
-        {
-            await _repository.EliminarExpediente(id);
+            await _repo.NuevoExpediente(ent);
         }
     }
 }

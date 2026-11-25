@@ -1,0 +1,91 @@
+# Stack completo para QA y desarrollo:
+#   frontend (nginx) -> api (.NET 10) -> db (SQL Server 2022)
+#
+# Uso:
+#   1. Copia .env.example a .env y cambia la contrasena.
+#   2. docker compose up --build
+#   3. Abre http://localhost:8080  (API directa: http://localhost:8081)
+#
+# Para empezar de cero (borra la base): docker compose down -v
+
+name: clinica-veterinaria
+
+services:
+  db:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    environment:
+      ACCEPT_EULA: "Y"
+      MSSQL_SA_PASSWORD: ${MSSQL_SA_PASSWORD:?Copia .env.example a .env y define MSSQL_SA_PASSWORD}
+    ports:
+      # 14330 en el host para no chocar con un SQL Server local en 1433.
+      - "14330:1433"
+    volumes:
+      - sqlserver_data:/var/opt/mssql
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "SQLCMD=/opt/mssql-tools18/bin/sqlcmd; [ -x $$SQLCMD ] || SQLCMD=/opt/mssql-tools/bin/sqlcmd; $$SQLCMD -S localhost -U sa -P $$MSSQL_SA_PASSWORD -C -Q 'SELECT 1' || exit 1",
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 20
+      start_period: 30s
+
+  db-init:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      MSSQL_SA_PASSWORD: ${MSSQL_SA_PASSWORD}
+    volumes:
+      - ./database:/scripts:ro
+    entrypoint: ["/bin/bash", "-c"]
+    command:
+      - |
+        SQLCMD=/opt/mssql-tools18/bin/sqlcmd
+        [ -x "$$SQLCMD" ] || SQLCMD=/opt/mssql-tools/bin/sqlcmd
+
+        echo ">> Esperando a que SQL Server acepte conexiones..."
+        for i in $$(seq 1 30); do
+          if "$$SQLCMD" -S db -U sa -P "$$MSSQL_SA_PASSWORD" -C -Q "SELECT 1" >/dev/null 2>&1; then
+            break
+          fi
+          sleep 2
+        done
+
+        for f in /scripts/00_create_database.sql /scripts/01_schema.sql /scripts/02_stored_procedures.sql /scripts/03_seed.sql; do
+          echo ">> Ejecutando $$f"
+          "$$SQLCMD" -S db -U sa -P "$$MSSQL_SA_PASSWORD" -C -b -d master -i "$$f" || exit 1
+        done
+        echo ">> Base de datos inicializada"
+    restart: "no"
+
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    depends_on:
+      db-init:
+        condition: service_completed_successfully
+    environment:
+      ASPNETCORE_ENVIRONMENT: Production
+      ConnectionStrings__default: "Server=db,1433;Database=Veterinaria_SaludAnimal;User Id=sa;Password=${MSSQL_SA_PASSWORD};Encrypt=True;TrustServerCertificate=True"
+      Cors__AllowedOrigins: ${CORS_ALLOWED_ORIGINS:-http://localhost:8080,http://localhost:5173}
+    ports:
+      - "8081:8080"
+
+  frontend:
+    build:
+      context: ./Frontend
+      dockerfile: Dockerfile
+      args:
+        VITE_API_URL: /api
+    depends_on:
+      - api
+    ports:
+      - "8080:80"
+
+volumes:
+  sqlserver_data:

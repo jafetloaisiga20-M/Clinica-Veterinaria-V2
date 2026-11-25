@@ -1,10 +1,12 @@
 ﻿using APLICATION.DTOs;
 using APLICATION.Servicios;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace PRESENTATION.Controllers
 {
+    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class PacienteController : ControllerBase
@@ -26,12 +28,12 @@ namespace PRESENTATION.Controllers
             }
             catch (Exception ex)
             {
-
-                return StatusCode(500, "entonce q pedo eso esta mal" + ex.Message);
+                return StatusCode(500, "Error interno del servidor.");
             }
         }
 
-        [HttpPost("Nueva cita")]
+        [AllowAnonymous]
+        [HttpPost("NuevaCita")]
         public async Task<IActionResult> NuevoPaciente(PacienteDTOs dTOs)
         {
             try
@@ -40,13 +42,12 @@ namespace PRESENTATION.Controllers
                 {
                     return BadRequest(new { msj = "papi nada llore mejor" });
                 }
-                await _services.NuevoPaciente(dTOs);
-                return StatusCode(201, "Paciente agregada puto");
+                var id = await _services.NuevoPaciente(dTOs);
+                return StatusCode(201, new { id, msj = "Paciente agregado correctamente." });
             }
             catch (Exception ex)
             {
-
-                return StatusCode(500, "nada papito malisimo volve a estudiar");
+                return StatusCode(500, "Error interno del servidor.");
             }
         }
     }

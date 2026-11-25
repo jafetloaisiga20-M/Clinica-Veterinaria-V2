@@ -3,6 +3,10 @@
 ###############################################################################
 * text=auto
 
+# Scripts de shell y Docker: siempre LF para que funcionen en Linux/CI
+*.sh text eol=lf
+Dockerfile text eol=lf
+
 ###############################################################################
 # Set default behavior for command prompt diff.
 #

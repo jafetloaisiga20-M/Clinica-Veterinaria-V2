@@ -33,7 +33,7 @@ namespace INFRASTRUCTURE.Repository
                     {
                         olist.Add(new TurnoGuardia
                         {
-                            ID_TURNO = Convert.ToInt32(dr["ID_CLIENTE"]),
+                            ID_TURNO = Convert.ToInt32(dr["ID_TURNO"]),
                             ID_VETERINARIO = Convert.ToInt32(dr["ID_VETERINARIO"]),
                             FECHA = Convert.ToDateTime(dr["FECHA"]),
                             HORA_INICIO = TimeOnly.FromTimeSpan((TimeSpan)dr["HORA_INICIO"]),
@@ -55,10 +55,10 @@ namespace INFRASTRUCTURE.Repository
             {
                 cmd.CommandType = CommandType.StoredProcedure;
 
-                cmd.Parameters.Add(new SqlParameter("@NOMBRE_COMPLETO", oTurno.ID_VETERINARIO));
-                cmd.Parameters.Add(new SqlParameter("@TELEFONO", oTurno.FECHA));
-                cmd.Parameters.Add(new SqlParameter("@WHATSAPP", oTurno.HORA_INICIO));
-                cmd.Parameters.Add(new SqlParameter("@EMAIL", oTurno.HORA_FIN));
+                cmd.Parameters.Add(new SqlParameter("@ID_VETERINARIO", oTurno.ID_VETERINARIO));
+                cmd.Parameters.Add(new SqlParameter("@FECHA", oTurno.FECHA));
+                cmd.Parameters.Add(new SqlParameter("@HORA_INICIO", oTurno.HORA_INICIO));
+                cmd.Parameters.Add(new SqlParameter("@HORA_FIN", oTurno.HORA_FIN));
                 
 
                 await cmd.ExecuteNonQueryAsync();

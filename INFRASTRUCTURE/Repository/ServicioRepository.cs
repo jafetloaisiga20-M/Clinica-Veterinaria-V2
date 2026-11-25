@@ -38,8 +38,8 @@ namespace INFRASTRUCTURE.Repository
                             ID_SERVICIO = Convert.ToInt32(dr["ID_SERVICIO"]),
                             NOMBRE_SERVICIO = dr["NOMBRE_SERVICIO"].ToString(),
                             CATEGORIA = dr["CATEGORIA"].ToString(),
-                            DESCRIPCION_DE_SERVICIO = dr["DESCRIPCION"].ToString(),
-                            PRECIO = Convert.ToInt32(dr["PRECIO"]),
+                            DESCRIPCION_DE_SERVICIO = dr["DESCRIPCION_DE_SERVICIO"].ToString(),
+                            PRECIO = Convert.ToDecimal(dr["PRECIO"]),
                             ESTADO = dr["ESTADO"].ToString()
                         });
                     }

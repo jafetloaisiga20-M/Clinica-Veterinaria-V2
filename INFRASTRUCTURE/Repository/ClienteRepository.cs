@@ -87,7 +87,7 @@ namespace INFRASTRUCTURE.Repository
             }
         }
 
-        public async Task NuevoClienteAsync(Cliente oCliente)
+        public async Task<int> NuevoClienteAsync(Cliente oCliente)
         {
             using var con = _dBconnecttionFactory.CreateConnection();
             await con.OpenAsync();
@@ -102,7 +102,8 @@ namespace INFRASTRUCTURE.Repository
                 cmd.Parameters.Add(new SqlParameter("@EMAIL", oCliente.EMAIL));
                 cmd.Parameters.Add(new SqlParameter("@DIRECCION", oCliente.DIRECCION));
 
-                await cmd.ExecuteNonQueryAsync();
+                var result = await cmd.ExecuteScalarAsync();
+                return result == null || result == DBNull.Value ? 0 : Convert.ToInt32(result);
             }
         }
     }

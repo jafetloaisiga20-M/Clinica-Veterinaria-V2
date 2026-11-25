@@ -24,9 +24,26 @@ namespace INFRASTRUCTURE.Repository
             _dBconnecttionFactory = bconnecttionFactory;
         }
 
-        public Task<IEnumerable<Enmienda>> ListarEnmiendaAsync()
+        public async Task<IEnumerable<Enmienda>> ListarEnmiendaAsync()
         {
-            throw new NotImplementedException();
+            var list = new List<Enmienda>();
+            using var con = _dBconnecttionFactory.CreateConnection();
+            await con.OpenAsync();
+            using var cmd = new SqlCommand(
+                "SELECT ID_ENMIENDA, ID_EXPEDIENTE, ID_VETERINARIO, NOTA_ADICIONAL, FECHA_ENMIENDA FROM dbo.ENMIENDA ORDER BY FECHA_ENMIENDA DESC", con);
+            using var dr = await cmd.ExecuteReaderAsync();
+            while (await dr.ReadAsync())
+            {
+                list.Add(new Enmienda
+                {
+                    ID_ENMIENDA = Convert.ToInt32(dr["ID_ENMIENDA"]),
+                    ID_EXPEDIENTE = Convert.ToInt32(dr["ID_EXPEDIENTE"]),
+                    ID_VETERINARIO = Convert.ToInt32(dr["ID_VETERINARIO"]),
+                    NOTA_ADICIONAL = dr["NOTA_ADICIONAL"].ToString() ?? "",
+                    FECHA_ENMIENDA = Convert.ToDateTime(dr["FECHA_ENMIENDA"])
+                });
+            }
+            return list;
         }
 
         public async Task NuevoEnmiendaAsync(Enmienda oEnmienda)
